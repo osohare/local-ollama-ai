@@ -1,0 +1,74 @@
+﻿services:
+  # --- OpenWebUI: chat UI. Talks to DMR for inference, SearXNG for web
+  # search, and Qdrant as the vector DB for RAG / document embeddings. ---
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      # Docker Model Runner exposes an OpenAI-compatible local API on the host.
+      # Set the endpoint explicitly and use the model name as a clean identifier.
+      - OLLAMA_BASE_URL=http://host.docker.internal:12434
+      - WEBUI_AUTH=false
+      # Vector DB for RAG
+      - VECTOR_DB=qdrant
+      - QDRANT_URI=http://qdrant:6333
+      # Web search via SearXNG
+      - ENABLE_RAG_WEB_SEARCH=true
+      - RAG_WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+
+    volumes:
+      - openwebui_data:/app/backend/data
+    depends_on:
+      - searxng
+      - qdrant
+      - model-setup
+    networks:
+      - ai-net
+
+  # --- SearXNG: metasearch engine backing OpenWebUI's web search feature ---
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    networks:
+      - ai-net
+    # Not published to the host on purpose — only OpenWebUI needs it.
+    # Uncomment to browse it directly at http://localhost:8081:
+    # ports:
+    #   - "8081:8080"
+
+  # --- Qdrant: vector database used by OpenWebUI for RAG ---
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"  # REST API
+      - "6334:6334"  # gRPC API
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - ai-net
+
+  model-setup:
+      image: docker:cli
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      command: >
+        "docker model pull ai/llama3.2 && docker model pull ai/qwen2.5 && docker model pull ai/smollm2"
+
+volumes:
+  openwebui_data:
+  qdrant_data:
+
+networks:
+  ai-net:
+    driver: bridge
