@@ -1,0 +1,24 @@
+# Dependencies
+/node_modules
+/__pycache__
+*.pyc
+*.log
+
+# Build artifacts
+/dist
+/build
+
+# IDE/Editor files
+.vscode/
+*.swp
+.vs/
+.idea/
+
+# C# files
+*.csproj.user
+*.suo
+/bin/
+/obj/
+
+# OS files
+.DS_Store
