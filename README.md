@@ -80,9 +80,11 @@ The compose file sets the following environment variables for Open WebUI:
 - `OLLAMA_BASE_URL=http://host.docker.internal:11434`
 - `RAG_EMBEDDING_ENGINE=ollama`
 - `RAG_EMBEDDING_MODEL=nomic-embed-text`
-- `ENABLE_RAG_WEB_SEARCH=true`
-- `RAG_WEB_SEARCH_ENGINE=searxng`
+- `ENABLE_WEB_SEARCH=true`
+- `WEB_SEARCH_ENGINE=searxng`
 - `VECTOR_DB=qdrant`
+
+Note: newer Open WebUI releases use the `ENABLE_WEB_SEARCH` and `WEB_SEARCH_ENGINE` variables; the older `ENABLE_RAG_WEB_SEARCH` / `RAG_WEB_SEARCH_ENGINE` names are legacy and are not recognized by current builds.
 
 The SearXNG config in `searxng/settings.yml` is intentionally minimal and local-first.
 
