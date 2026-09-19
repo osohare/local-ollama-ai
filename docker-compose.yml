@@ -10,22 +10,27 @@
     environment:
       # Docker Model Runner exposes an OpenAI-compatible local API on the host.
       # Set the endpoint explicitly and use the model name as a clean identifier.
-      - OLLAMA_BASE_URL=http://host.docker.internal:12434
-      - WEBUI_AUTH=false
-      # Vector DB for RAG
-      - VECTOR_DB=qdrant
-      - QDRANT_URI=http://qdrant:6333
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+#      - WEBUI_AUTH=false
+      # RAG
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=nomic-embed-text
       # Web search via SearXNG
       - ENABLE_RAG_WEB_SEARCH=true
       - RAG_WEB_SEARCH_ENGINE=searxng
       - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+      - WEB_SEARCH_RESULT_COUNT=5
+      # General
+      - ENABLE_SIGNUP=true
+      # Vector DB for RAG
+      - VECTOR_DB=qdrant
+      - QDRANT_URI=http://qdrant:6333
 
     volumes:
       - openwebui_data:/app/backend/data
     depends_on:
       - searxng
       - qdrant
-      - model-setup
     networks:
       - ai-net
 
@@ -57,13 +62,6 @@
       - qdrant_data:/qdrant/storage
     networks:
       - ai-net
-
-  model-setup:
-      image: docker:cli
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-      command: >
-        "docker model pull ai/llama3.2 && docker model pull ai/qwen2.5 && docker model pull ai/smollm2"
 
 volumes:
   openwebui_data:

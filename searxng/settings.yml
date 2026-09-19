@@ -3,6 +3,33 @@
 
 use_default_settings: true
 
+general:
+  instance_name: "Local AI Search"
+
+search:
+  safe_search: 0
+  autocomplete: "duckduckgo"
+
+  formats:
+    - html
+    - json
+
 server:
   secret_key: "9Fo7xnDAJU9uZGmMVa8EVKudDSI4BOK"
   image_proxy: true
+  limiter: false
+  image_proxy: true
+  #bind_address: "0.0.0.0"
+  #port: 8080
+
+engines:
+  - name: ahmia
+    disabled: true
+  - name: torch
+    disabled: true
+  - name: wikidata
+    disabled: true
+  - name: brave
+    disabled: true
+  - name: startpage
+    disabled: true
